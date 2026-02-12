@@ -105,9 +105,6 @@ namespace AzureBlobProject.Services
                 sasContainerSignature = blobContainerClient.GenerateSasUri(blobSasBuilder).AbsoluteUri.Split('?')[1].ToString();
             }
 
-
-
-
             await foreach (BlobItem blob in blobs)
             {
                 var blobClient = blobContainerClient.GetBlobClient(blob.Name);
