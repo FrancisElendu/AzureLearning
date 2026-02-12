@@ -36,9 +36,45 @@ namespace AzureBlobProject.Services
             return containerNames;
         }
 
-        public Task<List<string>> GetAllContainerAndBlobs()
+        public async Task<List<string>> GetAllContainerAndBlobs()
         {
-            throw new NotImplementedException();
+            List<string> containerAndBlobName = new List<string>();
+            containerAndBlobName.Add("-------------------Account Name: " + _blobClient.AccountName+"--------------------");
+            containerAndBlobName.Add("----------------------------------------------------------------------------------");
+
+
+
+
+            await foreach (BlobContainerItem blobContainerItem in _blobClient.GetBlobContainersAsync())
+            {
+                containerAndBlobName.Add("-------------"+blobContainerItem.Name);
+                BlobContainerClient blobContainer = _blobClient.GetBlobContainerClient(blobContainerItem.Name);
+                await foreach (BlobItem blobItem in blobContainer.GetBlobsAsync())
+                {
+                    //get blob metadata
+                    var blobClient = blobContainer.GetBlobClient(blobItem.Name);
+                    BlobProperties properties = await blobClient.GetPropertiesAsync();
+                    string tempBlobToAdd = blobItem.Name;
+                    //if(properties.Metadata.Count > 0)
+                    //{
+                    //    tempBlobToAdd += " (Metadata: ";
+                    //    foreach (var metadata in properties.Metadata)
+                    //    {
+                    //        tempBlobToAdd += metadata.Key + "=" + metadata.Value + "; ";
+                    //    }
+                    //    tempBlobToAdd += ")";
+                    //}
+                    if(properties.Metadata.ContainsKey("title"))
+                    {
+                        tempBlobToAdd += " (Title: " + properties.Metadata["title"] + ")";
+                    }
+
+                    containerAndBlobName.Add("--" + blobItem.Name);
+                    //containerAndBlobName.Add("-------------" + blobContainerItem.Name + " / " + blobItem.Name);
+                }
+                containerAndBlobName.Add("----------------------------------------------------------------------------------");
+            }
+            return containerAndBlobName;
         }
     }
 }

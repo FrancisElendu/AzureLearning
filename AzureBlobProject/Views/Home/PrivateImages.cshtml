@@ -1,0 +1,19 @@
+﻿@model List<BlobModel>
+<div class="p-4 container">
+    <div class="row">
+        <h4 class="text-primary">Private Images Container</h4>
+    </div>
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-4 border p-2">
+                <h4 class="text-success">@item.Title</h4>
+                <img src="@item.Uri" width="100%"/>
+                <h5 class="py-2">@item.Title</h5>
+                <p>@item.Comment</p>
+            </div>
+        }
+</div>
+    
+
+
