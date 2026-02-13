@@ -15,8 +15,8 @@ namespace AzureBlobProject.Services
         public async Task CreateContainer(string containerName)
         {
             BlobContainerClient blobContainerClient = _blobClient.GetBlobContainerClient(containerName);
-            await blobContainerClient.CreateIfNotExistsAsync();
-            //await blobContainerClient.CreateIfNotExistsAsync(PublicAccessType.BlobContainer);  // use this if you want to make the container public, so that the blobs inside it can be accessed without authentication.
+            //await blobContainerClient.CreateIfNotExistsAsync(PublicAccessType.None);
+            await blobContainerClient.CreateIfNotExistsAsync(PublicAccessType.BlobContainer);  // use this if you want to make the container public, so that the blobs inside it can be accessed without authentication.
 
         }
 

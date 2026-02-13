@@ -82,58 +82,61 @@ namespace AzureBlobProject.Services
             return blobNames;
 
         }
-
         public async Task<List<BlobModel>> GetAllBlobsWithUri(string containerName)
         {
             BlobContainerClient blobContainerClient = _blobClient.GetBlobContainerClient(containerName);
             var blobs = blobContainerClient.GetBlobsAsync();
             List<BlobModel> blobList = new List<BlobModel>();
+            string sasContainerSignature = string.Empty;
 
-            //generate a sas token for the container, because we need to add the container sas token to the blob sas token, because the blob sas token only contains the blob sas signature, and we need the container sas signature to access the blob.
-            string sasContainerSignature = "";
             if (blobContainerClient.CanGenerateSasUri)
             {
-                BlobSasBuilder blobSasBuilder = new BlobSasBuilder
+                BlobSasBuilder sasBuilder = new BlobSasBuilder()
                 {
                     BlobContainerName = blobContainerClient.Name,
-                    Resource = "c",
+                    Resource = "C",
                     ExpiresOn = DateTimeOffset.UtcNow.AddHours(1)
                 };
-                blobSasBuilder.SetPermissions(BlobContainerSasPermissions.Read);
-                //Uri sasUri = blobContainerClient.GenerateSasUri(blobSasBuilder);
-                //sasContainerSignature = sasUri.Query;
-                sasContainerSignature = blobContainerClient.GenerateSasUri(blobSasBuilder).AbsoluteUri.Split('?')[1].ToString();
+                sasBuilder.SetPermissions(BlobSasPermissions.Read);
+                sasContainerSignature = blobContainerClient.GenerateSasUri(sasBuilder).AbsoluteUri.Split('?')[1].ToString();
             }
 
-            await foreach (BlobItem blob in blobs)
+
+
+            await foreach (var blob in blobs)
             {
                 var blobClient = blobContainerClient.GetBlobClient(blob.Name);
+                var blobModel = new BlobModel()
+                {
+                    Uri = blobClient.Uri.AbsoluteUri + "?" + sasContainerSignature,
+                };
+
+                //if (blobClient.CanGenerateSasUri)
+                //{
+                //    BlobSasBuilder sasBuilder = new BlobSasBuilder()
+                //    {
+                //        //BlobContainerName = containerName,
+                //        BlobContainerName = blobClient.GetParentBlobContainerClient().Name,
+                //        BlobName = blobClient.Name,
+                //        Resource = "b",
+                //        ExpiresOn = DateTimeOffset.UtcNow.AddHours(1)
+                //    };
+                //    sasBuilder.SetPermissions(BlobSasPermissions.Read);
+                //    //Uri sasUri = blobClient.GenerateSasUri(sasBuilder);
+                //    //blobModel.Uri = sasUri.AbsoluteUri;
+                //    blobModel.Uri = blobClient.GenerateSasUri(sasBuilder).AbsoluteUri;
+                //}
 
                 BlobProperties properties = await blobClient.GetPropertiesAsync();
-
-                //generate a sas token for the blob, because we need to add the blob sas token to the blob uri, because the blob uri only contains the blob uri, and we need the blob sas token to access the blob.
-                if (blobClient.CanGenerateSasUri)
+                if (properties.Metadata.ContainsKey("title"))
                 {
-                    BlobSasBuilder blobSasBuilder = new BlobSasBuilder
-                    {
-                        //BlobContainerName = containerName,
-                        BlobContainerName = blobClient.GetParentBlobContainerClient().Name,
-                        BlobName = blob.Name,
-                        Resource = "b",
-                        ExpiresOn = DateTimeOffset.UtcNow.AddHours(1)
-                    };
-                    blobSasBuilder.SetPermissions(BlobSasPermissions.Read | BlobSasPermissions.Write);
-                    Uri sasUri = blobClient.GenerateSasUri(blobSasBuilder);
-                    // Generate a SAS URI for the blob with read permissions and an expiration time of 1 hour
-                    //Uri sasUri = blobClient.GenerateSasUri(Azure.Storage.Sas.BlobSasPermissions.Read, DateTimeOffset.UtcNow.AddHours(1));
-                    blobList.Add(new BlobModel
-                    {
-                        Title = properties.Metadata.ContainsKey("Title") ? properties.Metadata["Title"] : string.Empty,
-                        Comment = properties.Metadata.ContainsKey("Comment") ? properties.Metadata["Comment"] : string.Empty,
-                        //Uri = sasUri.AbsoluteUri //this is for the blob sas uri.
-                        Uri = sasUri.AbsoluteUri //+ "?" + sasContainerSignature // we have to add the container sas signature to the blob sas uri, because the blob sas uri only contains the blob sas signature, and we need the container sas signature to access the blob.
-                    });
+                    blobModel.Title = properties.Metadata["title"];
                 }
+                if (properties.Metadata.ContainsKey("comment"))
+                {
+                    blobModel.Title = properties.Metadata["comment"];
+                }
+                blobList.Add(blobModel);
             }
             return blobList;
         }

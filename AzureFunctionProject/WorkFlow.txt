@@ -1,0 +1,1 @@
+﻿When web form is filled out and submitted, the data is sent to an Azure Function. The Azure Function processes the data and writes it in an Azure Storage Queue.

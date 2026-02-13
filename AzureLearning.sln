@@ -7,6 +7,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureBlobProject", "AzureBl
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AzureBlob", "AzureBlob", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AzureFunction", "AzureFunction", "{FCDD7A1E-47B8-4A76-898B-54C684B8DF92}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureFunctionWeb", "AzureFunctionProject\AzureFunctionWeb.csproj", "{894FCDB1-ED0A-40A7-B27F-95B86BB037FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MayFloAzureFunction", "MayFloAzureFunction\MayFloAzureFunction.csproj", "{5BBB7CBC-4205-40DB-B778-B479D196C513}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,12 +23,22 @@ Global
 		{F4BD4B31-9A0F-4588-8331-5DA126471D16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4BD4B31-9A0F-4588-8331-5DA126471D16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4BD4B31-9A0F-4588-8331-5DA126471D16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{894FCDB1-ED0A-40A7-B27F-95B86BB037FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{894FCDB1-ED0A-40A7-B27F-95B86BB037FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{894FCDB1-ED0A-40A7-B27F-95B86BB037FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{894FCDB1-ED0A-40A7-B27F-95B86BB037FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BBB7CBC-4205-40DB-B778-B479D196C513}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BBB7CBC-4205-40DB-B778-B479D196C513}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BBB7CBC-4205-40DB-B778-B479D196C513}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BBB7CBC-4205-40DB-B778-B479D196C513}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F4BD4B31-9A0F-4588-8331-5DA126471D16} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{894FCDB1-ED0A-40A7-B27F-95B86BB037FF} = {FCDD7A1E-47B8-4A76-898B-54C684B8DF92}
+		{5BBB7CBC-4205-40DB-B778-B479D196C513} = {FCDD7A1E-47B8-4A76-898B-54C684B8DF92}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94076C73-8C39-4227-AEC3-07644EE7F18A}

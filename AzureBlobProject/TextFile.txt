@@ -1,0 +1,63 @@
+﻿public async Task<List<BlobModel>> GetAllBlobsWithUri(string containerName)
+        {
+            BlobContainerClient blobContainerClient = _blobClient.GetBlobContainerClient(containerName);
+            var blobs = blobContainerClient.GetBlobsAsync();
+            List<BlobModel> blobList = new List<BlobModel>();
+
+            //generate a sas token for the container, because we need to add the container sas token to the blob sas token, because the blob sas token only contains the blob sas signature, and we need the container sas signature to access the blob.
+            string sasContainerSignature = "";
+            if (blobContainerClient.CanGenerateSasUri)
+            {
+                BlobSasBuilder blobSasBuilder = new BlobSasBuilder
+                {
+                    BlobContainerName = blobContainerClient.Name,
+                    Resource = "c",
+                    ExpiresOn = DateTimeOffset.UtcNow.AddHours(1)
+                };
+                blobSasBuilder.SetPermissions(BlobContainerSasPermissions.Read);
+                Uri sasUri = blobContainerClient.GenerateSasUri(blobSasBuilder);
+                //sasContainerSignature = sasUri.Query;
+                sasContainerSignature = blobContainerClient.GenerateSasUri(blobSasBuilder).AbsoluteUri.Split('?')[1].ToString();
+            }
+
+            await foreach (BlobItem blob in blobs)
+            {
+                
+                var blobClient = blobContainerClient.GetBlobClient(blob.Name);
+                BlobProperties properties = await blobClient.GetPropertiesAsync();
+                BlobModel blobModel = new BlobModel
+                {
+                    Title = properties.Metadata.ContainsKey("Title") ? properties.Metadata["Title"] : string.Empty,
+                    Comment = properties.Metadata.ContainsKey("Comment") ? properties.Metadata["Comment"] : string.Empty,
+                    //Uri = blobClient.Uri.AbsoluteUri
+                    Uri = blobClient.Uri.AbsoluteUri + "?" + sasContainerSignature // we have to add the container sas signature to the blob uri, because the blob uri only contains the blob uri, and we need the container sas signature to access the blob.
+                };
+
+                
+
+                //generate a sas token for the blob, because we need to add the blob sas token to the blob uri, because the blob uri only contains the blob uri, and we need the blob sas token to access the blob.
+                if (blobClient.CanGenerateSasUri)
+                {
+                    BlobSasBuilder blobSasBuilder = new BlobSasBuilder
+                    {
+                        //BlobContainerName = containerName,
+                        BlobContainerName = blobClient.GetParentBlobContainerClient().Name,
+                        BlobName = blob.Name,
+                        Resource = "b",
+                        ExpiresOn = DateTimeOffset.UtcNow.AddHours(1)
+                    };
+                    blobSasBuilder.SetPermissions(BlobSasPermissions.Read | BlobSasPermissions.Write);
+                    Uri sasUri = blobClient.GenerateSasUri(blobSasBuilder);
+                    // Generate a SAS URI for the blob with read permissions and an expiration time of 1 hour
+                    //Uri sasUri = blobClient.GenerateSasUri(Azure.Storage.Sas.BlobSasPermissions.Read, DateTimeOffset.UtcNow.AddHours(1));
+                    blobList.Add(new BlobModel
+                    {
+                        Title = properties.Metadata.ContainsKey("Title") ? properties.Metadata["Title"] : string.Empty,
+                        Comment = properties.Metadata.ContainsKey("Comment") ? properties.Metadata["Comment"] : string.Empty,
+                        //Uri = sasUri.AbsoluteUri //this is for the blob sas uri.
+                        Uri = sasUri.AbsoluteUri + "?" + sasContainerSignature // we have to add the container sas signature to the blob sas uri, because the blob sas uri only contains the blob sas signature, and we need the container sas signature to access the blob.
+                    });
+                }
+            }
+            return blobList;
+        }
