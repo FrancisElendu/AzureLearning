@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /AzureBlobProject/appsettings.json
 /AzureFunctionProject/Properties/launchSettings.json
+/AzureFunctionProject/WorkFlow.txt
