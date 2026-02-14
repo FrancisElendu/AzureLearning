@@ -1,4 +1,5 @@
 using MayFloAzureFunction.Data;
+using MayFloAzureFunction.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,8 @@ builder.Services
 
 string connectionString = Environment.GetEnvironmentVariable("LocalSqlDataBase");
 //string connectionString = Environment.GetEnvironmentVariable("AzureSqlDataBase");
+
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.Services.AddDbContext<ApplicationDbContext> (context => context.UseSqlServer(connectionString));
 

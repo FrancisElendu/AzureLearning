@@ -24,7 +24,7 @@ namespace AzureFunctionProject.Controllers
         {
             var model = new SalesRequest
             {
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTime.UtcNow
             };
             return View(model);
         }
